@@ -2145,7 +2145,14 @@ async function renameWorkspaceItem(path) {
   const newName = window.prompt(`重命名「${oldName}」`, oldName);
   if (!newName || newName === oldName) return;
 
-  const dest = parentDir ? `${parentDir}/${newName}` : newName;
+  // 如果旧名有扩展名但新名没有，自动补上
+  const oldDot = oldName.lastIndexOf(".");
+  let finalName = newName;
+  if (oldDot >= 0 && newName.lastIndexOf(".") <= 0) {
+    finalName = newName + oldName.slice(oldDot);
+  }
+
+  const dest = parentDir ? `${parentDir}/${finalName}` : finalName;
   try {
     const res = await fetch("/api/files/move", {
       method: "POST",
